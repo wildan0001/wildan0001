@@ -1,1 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profil Saya + Bot + Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    section {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .bot-links a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: #222;
+      border: 2px solid #fff;
+    }
+    #gameControls {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
 
+<header>
+  <h1>👋 Selamat Datang di Website Saya</h1>
+  <p>Profil | Grup Bot | Permainan</p>
+</header>
+
+<section id="profile">
+  <h2>🧑 Tentang Saya</h2>
+  <p>Halo! Nama saya <strong>Wildan R</strong>. Saya seorang penggemar teknologi, pembuat bot, dan suka coding serta bermain game!</p>
+</section>
+
+<section id="bots">
+  <h2>🤖 Grup & Bot</h2>
+  <div class="bot-links">
+    <a href="https://wa.me/6283134284330" target="_blank">Bot Whatsapp</a>
+    <a href="https://chat.whatsapp.com/GVDjC0OiY1qECd7pl9XzHp" target="_blank">Grup WhatsApp</a>
+  </div>
+</section>
+
+<section id="game">
+  <h2>🎮 Game Mini – Snake</h2>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <div id="gameControls">
+    <p>Gunakan panah ← ↑ ↓ → untuk bermain</p>
+    <p id="score">Skor: 0</p>
+  </div>
+</section>
+
+<script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const gridSize = 20;
+  const tileCount = canvas.width / gridSize;
+
+  let snake = [{ x: 10, y: 10 }];
+  let direction = { x: 0, y: 0 };
+  let food = spawnFood();
+  let score = 0;
+  let gameInterval;
+
+  function spawnFood() {
+    return {
+      x: Math.floor(Math.random() * tileCount),
+      y: Math.floor(Math.random() * tileCount)
+    };
+  }
+
+  function gameLoop() {
+    const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+    // Game over jika tabrakan
+    if (
+      head.x < 0 || head.x >= tileCount ||
+      head.y < 0 || head.y >= tileCount ||
+      snake.some(segment => segment.x === head.x && segment.y === head.y)
+    ) {
+      clearInterval(gameInterval);
+      alert("Game Over! Skor: " + score);
+      return;
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      score++;
+      document.getElementById("score").textContent = "Skor: " + score;
+      food = spawnFood();
+    } else {
+      snake.pop();
+    }
+
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "lime";
+    snake.forEach(segment => {
+      ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+    });
+
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+  }
+
+  document.addEventListener("keydown", e => {
+    switch (e.key) {
+      case "ArrowUp": if (direction.y === 0) direction = { x: 0, y: -1 }; break;
+      case "ArrowDown": if (direction.y === 0) direction = { x: 0, y: 1 }; break;
+      case "ArrowLeft": if (direction.x === 0) direction = { x: -1, y: 0 }; break;
+      case "ArrowRight": if (direction.x === 0) direction = { x: 1, y: 0 }; break;
+    }
+  });
+
+  gameInterval = setInterval(gameLoop, 100);
+</script>
+
+</body>
+  </html>
