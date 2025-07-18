@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Profil Saya + Bot + Game</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profil Perkenalan & Game Tic Tac Toe</title>
   <style>
     body {
       margin: 0;
@@ -41,130 +41,116 @@
       padding-bottom: 5px;
     }
 
-    .bot-links a {
-      display: inline-block;
-      margin: 10px;
-      padding: 10px 20px;
-      background: #4CAF50;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      transition: background 0.3s ease;
-    }
-
-    .bot-links a:hover {
-      background: #45a049;
-    }
-
-    canvas {
-      display: block;
+    /* Tic Tac Toe styles */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
       margin: 20px auto;
-      background: #222;
-      border: 2px solid #fff;
     }
 
-    #gameControls {
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: #fff;
+      border: 2px solid #333;
+      font-size: 40px;
       text-align: center;
-      color: #333;
+      line-height: 100px;
+      cursor: pointer;
+      user-select: none;
       font-weight: bold;
+    }
+
+    #status {
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>👋 Selamat Datang di Website Saya</h1>
-    <p>Profil | Grup Bot | Game</p>
-  </header>
+<header>
+  <h1>👋 Selamat Datang di Halaman Website</h1>
+  <p>Perkenalan Diri & Permainan</p>
+</header>
 
-  <section id="profile">
-    <h2>🧑 Tentang Saya</h2>
-    <p>Halo! Nama saya <strong>Wildan R</strong>. Saya seorang penggemar teknologi, pembuat bot, dan suka coding serta bermain game!</p>
-  </section>
+<!-- Bagian Perkenalan -->
+<section id="profile">
+  <h2>🧑 Tentang Saya</h2>
+  <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, pembuat bot, dan bermain game</p>
+</section>
 
-  <section id="bots">
-    <h2>🤖 Grup & Bot</h2>
-    <div class="bot-links">
-      <a href="https://wa.me/6283134284330" target="_blank">Bot Whatsapp</a>
-      <a href="https://chat.whatsapp.com/GVDjC0OiY1qECd7pl9XzHp" target="_blank">Grup WhatsApp</a>
-    </div>
-  </section>
+<!-- Game Tic Tac Toe -->
+<section id="tictactoe">
+  <h2>❌⭕ Game Tic Tac Toe</h2>
+  <div id="board">
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+  </div>
+  <p id="status">Giliran: X</p>
+  <button onclick="resetGame()">🔄 Mulai Ulang</button>
+</section>
 
-  <section id="game">
-    <h2>🎮 Game Mini – Snake</h2>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div id="gameControls">
-      <p>Gunakan panah ← ↑ ↓ → untuk bermain</p>
-      <p id="score">Skor: 0</p>
-    </div>
-  </section>
+<script>
+  const cells = document.querySelectorAll(".cell");
+  const status = document.getElementById("status");
+  let turn = "X";
+  let gameOver = false;
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+  function checkWin() {
+    const wins = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+    return wins.some(combo => {
+      const [a, b, c] = combo;
+      return cells[a].textContent &&
+             cells[a].textContent === cells[b].textContent &&
+             cells[a].textContent === cells[c].textContent;
+    });
+  }
 
-    const gridSize = 20;
-    const tileCount = canvas.width / gridSize;
+  function checkDraw() {
+    return [...cells].every(cell => cell.textContent);
+  }
 
-    let snake = [{ x: 10, y: 10 }];
-    let direction = { x: 0, y: 0 };
-    let food = spawnFood();
-    let score = 0;
-    let gameInterval;
+  function resetGame() {
+    cells.forEach(cell => cell.textContent = "");
+    turn = "X";
+    gameOver = false;
+    status.textContent = "Giliran: " + turn;
+  }
 
-    function spawnFood() {
-      return {
-        x: Math.floor(Math.random() * tileCount),
-        y: Math.floor(Math.random() * tileCount)
-      };
-    }
-
-    function gameLoop() {
-      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-
-      if (
-        head.x < 0 || head.x >= tileCount ||
-        head.y < 0 || head.y >= tileCount ||
-        snake.some(segment => segment.x === head.x && segment.y === head.y)
-      ) {
-        clearInterval(gameInterval);
-        alert("Game Over! Skor akhir: " + score);
-        return;
-      }
-
-      snake.unshift(head);
-
-      if (head.x === food.x && head.y === food.y) {
-        score++;
-        document.getElementById("score").textContent = "Skor: " + score;
-        food = spawnFood();
+  cells.forEach(cell => {
+    cell.addEventListener("click", () => {
+      if (cell.textContent || gameOver) return;
+      cell.textContent = turn;
+      if (checkWin()) {
+        status.textContent = `${turn} menang! 🎉`;
+        gameOver = true;
+      } else if (checkDraw()) {
+        status.textContent = "Seri! 😅";
+        gameOver = true;
       } else {
-        snake.pop();
-      }
-
-      ctx.fillStyle = "#222";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "lime";
-      snake.forEach(segment => {
-        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
-      });
-
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
-    }
-
-    document.addEventListener("keydown", e => {
-      switch (e.key) {
-        case "ArrowUp": if (direction.y === 0) direction = { x: 0, y: -1 }; break;
-        case "ArrowDown": if (direction.y === 0) direction = { x: 0, y: 1 }; break;
-        case "ArrowLeft": if (direction.x === 0) direction = { x: -1, y: 0 }; break;
-        case "ArrowRight": if (direction.x === 0) direction = { x: 1, y: 0 }; break;
+        turn = turn === "X" ? "O" : "X";
+        status.textContent = "Giliran: " + turn;
       }
     });
-
-    gameInterval = setInterval(gameLoop, 100);
-  </script>
+  });
+</script>
 
 </body>
 </html>
