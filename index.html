@@ -41,7 +41,6 @@
       padding-bottom: 5px;
     }
 
-    /* Tic Tac Toe styles */
     #board {
       display: grid;
       grid-template-columns: repeat(3, 100px);
@@ -84,13 +83,11 @@
   <h1>👋 Selamat Datang di Halaman Website</h1>
 </header>
 
-<!-- Bagian Perkenalan -->
 <section id="profile">
   <h2>🧑 Tentang Saya</h2>
   <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka bermain game</p>
 </section>
 
-<!-- Bagian Grup Bot -->
 <section id="bot-group">
   <h2>🤖 Grup Bot</h2>
   <p>Bergabunglah dengan komunitas dan bermain bot buatan saya!</p>
@@ -99,25 +96,23 @@
   </a>
 </section>
 
-<!-- Game Tic Tac Toe -->
 <section id="tictactoe">
-  <h2>❌⭕ Game Tic Tac Toe</h2>
+  <h2>❌⭕ Game Tic Tac Toe (vs Bot)</h2>
   <div id="board">
     <div class="cell"></div><div class="cell"></div><div class="cell"></div>
     <div class="cell"></div><div class="cell"></div><div class="cell"></div>
     <div class="cell"></div><div class="cell"></div><div class="cell"></div>
   </div>
-  <p id="status">Giliran: X</p>
+  <p id="status">Giliran: X (Kamu)</p>
   <button onclick="resetGame()">🔄 Mulai Ulang</button>
 </section>
 
 <script>
   const cells = document.querySelectorAll(".cell");
   const status = document.getElementById("status");
-  let turn = "X";
   let gameOver = false;
 
-  function checkWin() {
+  function checkWin(mark) {
     const wins = [
       [0,1,2], [3,4,5], [6,7,8],
       [0,3,6], [1,4,7], [2,5,8],
@@ -125,9 +120,9 @@
     ];
     return wins.some(combo => {
       const [a, b, c] = combo;
-      return cells[a].textContent &&
-             cells[a].textContent === cells[b].textContent &&
-             cells[a].textContent === cells[c].textContent;
+      return cells[a].textContent === mark &&
+             cells[b].textContent === mark &&
+             cells[c].textContent === mark;
     });
   }
 
@@ -135,26 +130,46 @@
     return [...cells].every(cell => cell.textContent);
   }
 
+  function botMove() {
+    if (gameOver) return;
+    let emptyCells = [...cells].filter(cell => cell.textContent === "");
+    if (emptyCells.length === 0) return;
+
+    let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    randomCell.textContent = "O";
+
+    if (checkWin("O")) {
+      status.textContent = "Bot menang! 🤖🎉";
+      gameOver = true;
+    } else if (checkDraw()) {
+      status.textContent = "Seri! 😅";
+      gameOver = true;
+    } else {
+      status.textContent = "Giliran: X (Kamu)";
+    }
+  }
+
   function resetGame() {
     cells.forEach(cell => cell.textContent = "");
-    turn = "X";
     gameOver = false;
-    status.textContent = "Giliran: " + turn;
+    status.textContent = "Giliran: X (Kamu)";
   }
 
   cells.forEach(cell => {
     cell.addEventListener("click", () => {
       if (cell.textContent || gameOver) return;
-      cell.textContent = turn;
-      if (checkWin()) {
-        status.textContent = `${turn} menang! 🎉`;
+
+      cell.textContent = "X";
+
+      if (checkWin("X")) {
+        status.textContent = "Kamu menang! 🎉";
         gameOver = true;
       } else if (checkDraw()) {
         status.textContent = "Seri! 😅";
         gameOver = true;
       } else {
-        turn = turn === "X" ? "O" : "X";
-        status.textContent = "Giliran: " + turn;
+        status.textContent = "Giliran: O (Bot...)";
+        setTimeout(botMove, 500); // kasih delay agar lebih realistis
       }
     });
   });
