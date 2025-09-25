@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profil Perkenalan & Game Tic Tac Toe + Dino</title>
+  <title>Profil Perkenalan & Game Tic Tac Toe</title>
   <style>
     body {
       margin: 0;
@@ -13,17 +13,20 @@
       animation: gradientShift 15s ease infinite;
       color: #333;
     }
+
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+
     header {
       background-color: rgba(0, 0, 0, 0.7);
       color: white;
       padding: 20px;
       text-align: center;
     }
+
     section {
       background-color: rgba(255, 255, 255, 0.9);
       padding: 20px;
@@ -32,10 +35,12 @@
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
+
     h2 {
       border-bottom: 2px solid #ddd;
       padding-bottom: 5px;
     }
+
     #board {
       display: grid;
       grid-template-columns: repeat(3, 100px);
@@ -43,6 +48,7 @@
       justify-content: center;
       margin: 20px auto;
     }
+
     .cell {
       width: 100px;
       height: 100px;
@@ -55,11 +61,13 @@
       user-select: none;
       font-weight: bold;
     }
+
     #status {
       text-align: center;
       font-weight: bold;
       font-size: 18px;
     }
+
     button {
       display: block;
       margin: 10px auto;
@@ -67,15 +75,19 @@
       font-size: 16px;
       cursor: pointer;
     }
-    /* Dino Game */
-    #dinoGame {
-      text-align: center;
-    }
-    canvas {
-      background: #fff;
-      border: 2px solid #333;
+
+    /* Snake game style */
+    #snakeCanvas {
       display: block;
-      margin: 10px auto;
+      margin: 20px auto;
+      background: #000;
+      border: 4px solid #333;
+    }
+    #snakeScore {
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -87,9 +99,8 @@
 
 <section id="profile">
   <h2>🧑 Tentang Saya</h2>
-  <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka bermain game</p>
+  <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka scroll tiktok</p>
 </section>
-
 
 <section id="tictactoe">
   <h2>❌⭕ Game Tic Tac Toe (vs Bot)</h2>
@@ -102,15 +113,14 @@
   <button onclick="resetGame()">🔄 Mulai Ulang</button>
 </section>
 
-<section id="dinoGame">
-  <h2>🦖 Game Chrome Dino</h2>
-  <p>Tekan <b>Spasi</b> untuk melompat</p>
-  <canvas id="gameCanvas" width="600" height="200"></canvas>
-  <p id="score">Score: 0</p>
+<section id="snake">
+  <h2>🐍 Game Snake</h2>
+  <canvas id="snakeCanvas" width="400" height="400"></canvas>
+  <p id="snakeScore">Skor: 0</p>
 </section>
 
 <script>
-  /* ==================== Tic Tac Toe ==================== */
+  // ================= Tic Tac Toe =================
   const cells = document.querySelectorAll(".cell");
   const status = document.getElementById("status");
   let gameOver = false;
@@ -177,83 +187,79 @@
     });
   });
 
-  /* ==================== Chrome Dino ==================== */
-  const canvas = document.getElementById("gameCanvas");
+  // ================= Snake Game =================
+  const canvas = document.getElementById("snakeCanvas");
   const ctx = canvas.getContext("2d");
-  const scoreEl = document.getElementById("score");
+  const scoreDisplay = document.getElementById("snakeScore");
 
-  let dino = { x: 50, y: 150, width: 30, height: 30, dy: 0, jump: -8, gravity: 0.4 };
-  let obstacles = [];
+  const box = 20;
+  let snake = [{x: 9 * box, y: 10 * box}];
+  let food = {
+    x: Math.floor(Math.random() * 20) * box,
+    y: Math.floor(Math.random() * 20) * box
+  };
   let score = 0;
-  let gameRunning = true;
+  let d;
 
-  function drawDino() {
-    ctx.fillStyle = "green";
-    ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+  document.addEventListener("keydown", direction);
+
+  function direction(event) {
+    if ((event.key === "ArrowLeft" || event.key === "a") && d !== "RIGHT") d = "LEFT";
+    else if ((event.key === "ArrowUp" || event.key === "w") && d !== "DOWN") d = "UP";
+    else if ((event.key === "ArrowRight" || event.key === "d") && d !== "LEFT") d = "RIGHT";
+    else if ((event.key === "ArrowDown" || event.key === "s") && d !== "UP") d = "DOWN";
   }
 
-  function drawObstacles() {
-    ctx.fillStyle = "brown";
-    obstacles.forEach(obs => {
-      ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-    });
-  }
+  function draw() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  function update() {
-    if (!gameRunning) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < snake.length; i++) {
+      ctx.fillStyle = (i === 0) ? "lime" : "white";
+      ctx.fillRect(snake[i].x, snake[i].y, box, box);
+      ctx.strokeStyle = "black";
+      ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+    }
 
-    // Dino physics
-    dino.y += dino.dy;
-    if (dino.y + dino.height < canvas.height) {
-      dino.dy += dino.gravity;
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x, food.y, box, box);
+
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+
+    if (d === "LEFT") snakeX -= box;
+    if (d === "UP") snakeY -= box;
+    if (d === "RIGHT") snakeX += box;
+    if (d === "DOWN") snakeY += box;
+
+    if (snakeX === food.x && snakeY === food.y) {
+      score++;
+      food = {
+        x: Math.floor(Math.random() * 20) * box,
+        y: Math.floor(Math.random() * 20) * box
+      };
     } else {
-      dino.y = canvas.height - dino.height;
-      dino.dy = 0;
+      snake.pop();
     }
 
-    // Obstacle movement
-    obstacles.forEach(obs => {
-      obs.x -= 5;
-    });
+    let newHead = {x: snakeX, y: snakeY};
 
-    // Remove off-screen obstacles
-    obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
-
-    // Spawn new obstacle
-    if (Math.random() < 0.02) {
-      obstacles.push({ x: canvas.width, y: 170, width: 20, height: 30 });
+    // game over conditions
+    if (
+      snakeX < 0 || snakeY < 0 ||
+      snakeX >= canvas.width || snakeY >= canvas.height ||
+      snake.some(part => part.x === newHead.x && part.y === newHead.y)
+    ) {
+      clearInterval(game);
+      alert("Game Over! Skormu: " + score);
     }
 
-    // Collision detection
-    obstacles.forEach(obs => {
-      if (dino.x < obs.x + obs.width &&
-          dino.x + dino.width > obs.x &&
-          dino.y < obs.y + obs.height &&
-          dino.y + dino.height > obs.y) {
-        gameRunning = false;
-        scoreEl.textContent = "Game Over! Skor akhir: " + score;
-      }
-    });
+    snake.unshift(newHead);
 
-    // Draw
-    drawDino();
-    drawObstacles();
-
-    // Update score
-    score++;
-    scoreEl.textContent = "Score: " + score;
-
-    requestAnimationFrame(update);
+    scoreDisplay.textContent = "Skor: " + score;
   }
 
-  document.addEventListener("keydown", e => {
-    if (e.code === "Space" && dino.dy === 0) {
-      dino.dy = dino.jump;
-    }
-  });
-
-  update();
+  let game = setInterval(draw, 100);
 </script>
 
 </body>
