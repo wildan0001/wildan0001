@@ -76,18 +76,16 @@
       cursor: pointer;
     }
 
-    /* Snake game style */
-    #snakeCanvas {
-      display: block;
-      margin: 20px auto;
-      background: #000;
-      border: 4px solid #333;
+    #quiz input {
+      padding: 8px;
+      font-size: 16px;
+      width: 100px;
+      margin-right: 10px;
     }
-    #snakeScore {
-      text-align: center;
-      font-weight: bold;
+
+    #quiz p {
       font-size: 18px;
-      margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -113,14 +111,18 @@
   <button onclick="resetGame()">🔄 Mulai Ulang</button>
 </section>
 
-<section id="snake">
-  <h2>🐍 Game Snake</h2>
-  <canvas id="snakeCanvas" width="400" height="400"></canvas>
-  <p id="snakeScore">Skor: 0</p>
+<section id="quiz">
+  <h2>➗✖️ Game Perkalian & Pembagian</h2>
+  <p id="question">Soal akan muncul di sini...</p>
+  <input type="number" id="answer" placeholder="Jawaban">
+  <button onclick="checkAnswer()">✔️ Jawab</button>
+  <p id="feedback"></p>
+  <p>Skor: <span id="score">0</span></p>
+  <button onclick="newQuestion()">🔄 Soal Baru</button>
 </section>
 
 <script>
-  // ================= Tic Tac Toe =================
+  // === Game Tic Tac Toe ===
   const cells = document.querySelectorAll(".cell");
   const status = document.getElementById("status");
   let gameOver = false;
@@ -187,79 +189,46 @@
     });
   });
 
-  // ================= Snake Game =================
-  const canvas = document.getElementById("snakeCanvas");
-  const ctx = canvas.getContext("2d");
-  const scoreDisplay = document.getElementById("snakeScore");
-
-  const box = 20;
-  let snake = [{x: 9 * box, y: 10 * box}];
-  let food = {
-    x: Math.floor(Math.random() * 20) * box,
-    y: Math.floor(Math.random() * 20) * box
-  };
+  // === Game Perkalian & Pembagian ===
+  let correctAnswer = 0;
   let score = 0;
-  let d;
 
-  document.addEventListener("keydown", direction);
+  function newQuestion() {
+    let num1 = Math.floor(Math.random() * 10) + 1;
+    let num2 = Math.floor(Math.random() * 10) + 1;
+    let isMultiply = Math.random() < 0.5; // 50% kali, 50% bagi
 
-  function direction(event) {
-    if ((event.key === "ArrowLeft" || event.key === "a") && d !== "RIGHT") d = "LEFT";
-    else if ((event.key === "ArrowUp" || event.key === "w") && d !== "DOWN") d = "UP";
-    else if ((event.key === "ArrowRight" || event.key === "d") && d !== "LEFT") d = "RIGHT";
-    else if ((event.key === "ArrowDown" || event.key === "s") && d !== "UP") d = "DOWN";
-  }
-
-  function draw() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = 0; i < snake.length; i++) {
-      ctx.fillStyle = (i === 0) ? "lime" : "white";
-      ctx.fillRect(snake[i].x, snake[i].y, box, box);
-      ctx.strokeStyle = "black";
-      ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-    }
-
-    ctx.fillStyle = "red";
-    ctx.fillRect(food.x, food.y, box, box);
-
-    let snakeX = snake[0].x;
-    let snakeY = snake[0].y;
-
-    if (d === "LEFT") snakeX -= box;
-    if (d === "UP") snakeY -= box;
-    if (d === "RIGHT") snakeX += box;
-    if (d === "DOWN") snakeY += box;
-
-    if (snakeX === food.x && snakeY === food.y) {
-      score++;
-      food = {
-        x: Math.floor(Math.random() * 20) * box,
-        y: Math.floor(Math.random() * 20) * box
-      };
+    if (isMultiply) {
+      document.getElementById("question").textContent = `${num1} × ${num2} = ?`;
+      correctAnswer = num1 * num2;
     } else {
-      snake.pop();
+      let product = num1 * num2;
+      document.getElementById("question").textContent = `${product} ÷ ${num1} = ?`;
+      correctAnswer = num2;
     }
 
-    let newHead = {x: snakeX, y: snakeY};
-
-    // game over conditions
-    if (
-      snakeX < 0 || snakeY < 0 ||
-      snakeX >= canvas.width || snakeY >= canvas.height ||
-      snake.some(part => part.x === newHead.x && part.y === newHead.y)
-    ) {
-      clearInterval(game);
-      alert("Game Over! Skormu: " + score);
-    }
-
-    snake.unshift(newHead);
-
-    scoreDisplay.textContent = "Skor: " + score;
+    document.getElementById("answer").value = "";
+    document.getElementById("feedback").textContent = "";
   }
 
-  let game = setInterval(draw, 100);
+  function checkAnswer() {
+    let userAnswer = parseInt(document.getElementById("answer").value);
+    if (isNaN(userAnswer)) {
+      document.getElementById("feedback").textContent = "⚠️ Masukkan angka!";
+      return;
+    }
+
+    if (userAnswer === correctAnswer) {
+      score++;
+      document.getElementById("feedback").textContent = "✅ Benar!";
+    } else {
+      document.getElementById("feedback").textContent = `❌ Salah! Jawaban benar: ${correctAnswer}`;
+    }
+    document.getElementById("score").textContent = score;
+  }
+
+  // mulai langsung dengan soal pertama
+  newQuestion();
 </script>
 
 </body>
