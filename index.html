@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profil Perkenalan & Game Tic Tac Toe</title>
+  <title>Profil Perkenalan & Game Tic Tac Toe + Dino</title>
   <style>
     body {
       margin: 0;
@@ -13,20 +13,17 @@
       animation: gradientShift 15s ease infinite;
       color: #333;
     }
-
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     header {
       background-color: rgba(0, 0, 0, 0.7);
       color: white;
       padding: 20px;
       text-align: center;
     }
-
     section {
       background-color: rgba(255, 255, 255, 0.9);
       padding: 20px;
@@ -35,12 +32,10 @@
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-
     h2 {
       border-bottom: 2px solid #ddd;
       padding-bottom: 5px;
     }
-
     #board {
       display: grid;
       grid-template-columns: repeat(3, 100px);
@@ -48,7 +43,6 @@
       justify-content: center;
       margin: 20px auto;
     }
-
     .cell {
       width: 100px;
       height: 100px;
@@ -61,19 +55,27 @@
       user-select: none;
       font-weight: bold;
     }
-
     #status {
       text-align: center;
       font-weight: bold;
       font-size: 18px;
     }
-
     button {
       display: block;
       margin: 10px auto;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+    }
+    /* Dino Game */
+    #dinoGame {
+      text-align: center;
+    }
+    canvas {
+      background: #fff;
+      border: 2px solid #333;
+      display: block;
+      margin: 10px auto;
     }
   </style>
 </head>
@@ -88,13 +90,6 @@
   <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka bermain game</p>
 </section>
 
-<section id="bot-group">
-  <h2>🤖 Grup Bot</h2>
-  <p>Bergabunglah dengan komunitas dan bermain bot buatan saya!</p>
-  <a href="https://chat.whatsapp.com/GVDjC0OiY1qECd7pl9XzHp" target="_blank">
-    <button>🚀 Gabung Grup Whatsapp</button>
-  </a>
-</section>
 
 <section id="tictactoe">
   <h2>❌⭕ Game Tic Tac Toe (vs Bot)</h2>
@@ -107,7 +102,15 @@
   <button onclick="resetGame()">🔄 Mulai Ulang</button>
 </section>
 
+<section id="dinoGame">
+  <h2>🦖 Game Chrome Dino</h2>
+  <p>Tekan <b>Spasi</b> untuk melompat</p>
+  <canvas id="gameCanvas" width="600" height="200"></canvas>
+  <p id="score">Score: 0</p>
+</section>
+
 <script>
+  /* ==================== Tic Tac Toe ==================== */
   const cells = document.querySelectorAll(".cell");
   const status = document.getElementById("status");
   let gameOver = false;
@@ -169,10 +172,88 @@
         gameOver = true;
       } else {
         status.textContent = "Giliran: O (Bot...)";
-        setTimeout(botMove, 500); // kasih delay agar lebih realistis
+        setTimeout(botMove, 500);
       }
     });
   });
+
+  /* ==================== Chrome Dino ==================== */
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  const scoreEl = document.getElementById("score");
+
+  let dino = { x: 50, y: 150, width: 30, height: 30, dy: 0, jump: -8, gravity: 0.4 };
+  let obstacles = [];
+  let score = 0;
+  let gameRunning = true;
+
+  function drawDino() {
+    ctx.fillStyle = "green";
+    ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+  }
+
+  function drawObstacles() {
+    ctx.fillStyle = "brown";
+    obstacles.forEach(obs => {
+      ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+    });
+  }
+
+  function update() {
+    if (!gameRunning) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dino physics
+    dino.y += dino.dy;
+    if (dino.y + dino.height < canvas.height) {
+      dino.dy += dino.gravity;
+    } else {
+      dino.y = canvas.height - dino.height;
+      dino.dy = 0;
+    }
+
+    // Obstacle movement
+    obstacles.forEach(obs => {
+      obs.x -= 5;
+    });
+
+    // Remove off-screen obstacles
+    obstacles = obstacles.filter(obs => obs.x + obs.width > 0);
+
+    // Spawn new obstacle
+    if (Math.random() < 0.02) {
+      obstacles.push({ x: canvas.width, y: 170, width: 20, height: 30 });
+    }
+
+    // Collision detection
+    obstacles.forEach(obs => {
+      if (dino.x < obs.x + obs.width &&
+          dino.x + dino.width > obs.x &&
+          dino.y < obs.y + obs.height &&
+          dino.y + dino.height > obs.y) {
+        gameRunning = false;
+        scoreEl.textContent = "Game Over! Skor akhir: " + score;
+      }
+    });
+
+    // Draw
+    drawDino();
+    drawObstacles();
+
+    // Update score
+    score++;
+    scoreEl.textContent = "Score: " + score;
+
+    requestAnimationFrame(update);
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.code === "Space" && dino.dy === 0) {
+      dino.dy = dino.jump;
+    }
+  });
+
+  update();
 </script>
 
 </body>
