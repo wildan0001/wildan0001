@@ -1,235 +1,179 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profil Perkenalan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yaudah Iya</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(270deg, #ff6ec4, #7873f5, #4ecdc4, #ffe66d, #ff6ec4);
-      background-size: 1000% 1000%;
-      animation: gradientShift 15s ease infinite;
-      color: #333;
+      background: linear-gradient(270deg, #ff6ec7, #42a5f5, #ffb74d);
+      background-size: 600% 600%;
+      animation: gradientBG 12s ease infinite;
+      min-height: 100vh;
     }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes gradientBG {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
-
-    header {
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    section {
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      max-width: 800px;
-      margin: 20px auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    h2 {
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 5px;
-    }
-
-    #board {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      gap: 5px;
-      justify-content: center;
-      margin: 20px auto;
-    }
-
-    .cell {
-      width: 100px;
-      height: 100px;
+    .sidebar {
+      width: 260px;
+      position: fixed;
+      top: 0;
+      left: -260px;
+      height: 100%;
       background: #fff;
-      border: 2px solid #333;
-      font-size: 40px;
-      text-align: center;
-      line-height: 100px;
-      cursor: pointer;
-      user-select: none;
-      font-weight: bold;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 1000;
     }
-
-    #status {
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
+    .sidebar.active { left: 0; }
+    .sidebar h3 { font-weight: bold; }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      z-index: 900;
     }
-
-    button {
-      display: block;
-      margin: 10px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #quiz input {
-      padding: 8px;
-      font-size: 16px;
-      width: 100px;
-      margin-right: 10px;
-    }
-
-    #quiz p {
-      font-size: 18px;
-      font-weight: bold;
+    .overlay.active { display: block; }
+    .card {
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>👋 Selamat Datang di Halaman Website</h1>
-</header>
-
-<section id="profile">
-  <h2>🧑 Tentang Saya</h2>
-  <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka scroll tiktok</p>
-</section>
-
-<section id="tictactoe">
-  <h2>❌⭕ Game Tic Tac Toe (vs Bot)</h2>
-  <div id="board">
-    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+<!-- Navbar -->
+<nav class="navbar bg-light shadow-sm">
+  <div class="container-fluid">
+    <button class="btn btn-outline-primary" id="menuBtn">☰</button>
+    <span class="fw-bold">Yaudah Iya</span>
+    <img src="https://placekitten.com/50/50" class="rounded-circle" width="40" height="40">
   </div>
-  <p id="status">Giliran: X (Kamu)</p>
-  <button onclick="resetGame()">🔄 Mulai Ulang</button>
-</section>
+</nav>
 
-<section id="quiz">
-  <h2>➗✖️ Game Perkalian & Pembagian</h2>
-  <p id="question">Soal akan muncul di sini...</p>
-  <input type="number" id="answer" placeholder="Jawaban">
-  <button onclick="checkAnswer()">✔️ Jawab</button>
-  <p id="feedback"></p>
-  <p>Skor: <span id="score">0</span></p>
-  <button onclick="newQuestion()">🔄 Soal Baru</button>
-</section>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="btn btn-sm btn-danger mb-3" id="closeBtn">✖</button>
+  <h3>Yaudah <span class="text-primary">Iya</span></h3>
+  <hr>
+  <h6>PAGE LIST</h6>
+  <ul class="list-unstyled">
+    <li>📌 BayMax AI</li>
+    <li>🤖 Gemini AI</li>
+    <li>🌸 Flowers Name</li>
+    <li>☁️ Weather App</li>
+    <li>💱 Currency Converter</li>
+    <li>🖼️ Image Gallery</li>
+    <li>✍️ Image Editor</li>
+    <li>💬 Random Quote</li>
+    <li>🔒 HTML Encrypter</li>
+    <li>🌀 Javascript Obfuscator</li>
+    <li>🎵 Spotify Player</li>
+    <li>😊 Maukah Kamu</li>
+    <li>💰 Donation</li>
+  </ul>
+  <hr>
+  <h6>CONTACT</h6>
+  <p>📱 WhatsApp<br>📷 Instagram</p>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<!-- Content -->
+<div class="container py-4">
+  <div class="row g-3">
+    <!-- Time Info -->
+    <div class="col-12">
+      <div class="card p-3 text-center">
+        <h5 class="fw-bold">Time Information</h5>
+        <h3 id="time">--:--:--</h3>
+        <p id="greet">Hello!</p>
+      </div>
+    </div>
+    <!-- Visitors -->
+    <div class="col-12">
+      <div class="card p-3 text-center">
+        <h5 class="fw-bold">Visitors Information</h5>
+        <h3>1</h3>
+        <p>visitors</p>
+      </div>
+    </div>
+    <!-- Battery -->
+    <div class="col-12">
+      <div class="card p-3 text-center">
+        <h5 class="fw-bold">Battery Information</h5>
+        <h3 id="battery">--%</h3>
+        <p id="batteryStatus">Checking...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thanks -->
+  <div class="card mt-4 p-3">
+    <h6>🌟 Special Thanks To:</h6>
+    <ul>
+      <li>Allah SWT</li>
+      <li>Nabi Muhammad Saw.</li>
+      <li>Vercel App</li>
+    </ul>
+  </div>
+
+  <footer class="text-center text-white mt-4">
+    <p>Copyright © 2025 WildanR. All rights reserved.</p>
+  </footer>
+</div>
 
 <script>
-  // === Game Tic Tac Toe ===
-  const cells = document.querySelectorAll(".cell");
-  const status = document.getElementById("status");
-  let gameOver = false;
-
-  function checkWin(mark) {
-    const wins = [
-      [0,1,2], [3,4,5], [6,7,8],
-      [0,3,6], [1,4,7], [2,5,8],
-      [0,4,8], [2,4,6]
-    ];
-    return wins.some(combo => {
-      const [a, b, c] = combo;
-      return cells[a].textContent === mark &&
-             cells[b].textContent === mark &&
-             cells[c].textContent === mark;
-    });
-  }
-
-  function checkDraw() {
-    return [...cells].every(cell => cell.textContent);
-  }
-
-  function botMove() {
-    if (gameOver) return;
-    let emptyCells = [...cells].filter(cell => cell.textContent === "");
-    if (emptyCells.length === 0) return;
-
-    let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    randomCell.textContent = "O";
-
-    if (checkWin("O")) {
-      status.textContent = "Bot menang! 🤖🎉";
-      gameOver = true;
-    } else if (checkDraw()) {
-      status.textContent = "Seri! 😅";
-      gameOver = true;
-    } else {
-      status.textContent = "Giliran: X (Kamu)";
-    }
-  }
-
-  function resetGame() {
-    cells.forEach(cell => cell.textContent = "");
-    gameOver = false;
-    status.textContent = "Giliran: X (Kamu)";
-  }
-
-  cells.forEach(cell => {
-    cell.addEventListener("click", () => {
-      if (cell.textContent || gameOver) return;
-
-      cell.textContent = "X";
-
-      if (checkWin("X")) {
-        status.textContent = "Kamu menang! 🎉";
-        gameOver = true;
-      } else if (checkDraw()) {
-        status.textContent = "Seri! 😅";
-        gameOver = true;
-      } else {
-        status.textContent = "Giliran: O (Bot...)";
-        setTimeout(botMove, 500);
-      }
-    });
+  // Sidebar toggle
+  const menuBtn = document.getElementById('menuBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  menuBtn.addEventListener('click', () => {
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+  });
+  closeBtn.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
   });
 
-  // === Game Perkalian & Pembagian ===
-  let correctAnswer = 0;
-  let score = 0;
-
-  function newQuestion() {
-    let num1 = Math.floor(Math.random() * 10) + 1;
-    let num2 = Math.floor(Math.random() * 10) + 1;
-    let isMultiply = Math.random() < 0.5; // 50% kali, 50% bagi
-
-    if (isMultiply) {
-      document.getElementById("question").textContent = `${num1} × ${num2} = ?`;
-      correctAnswer = num1 * num2;
-    } else {
-      let product = num1 * num2;
-      document.getElementById("question").textContent = `${product} ÷ ${num1} = ?`;
-      correctAnswer = num2;
-    }
-
-    document.getElementById("answer").value = "";
-    document.getElementById("feedback").textContent = "";
+  // Time updater
+  function updateTime() {
+    let now = new Date();
+    let h = String(now.getHours()).padStart(2,'0');
+    let m = String(now.getMinutes()).padStart(2,'0');
+    let s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('time').innerText = `${h}:${m}:${s}`;
+    document.getElementById('greet').innerText = h < 12 ? "Good Morning!" : h < 18 ? "Good Afternoon!" : "Good Evening!";
   }
+  setInterval(updateTime,1000);
 
-  function checkAnswer() {
-    let userAnswer = parseInt(document.getElementById("answer").value);
-    if (isNaN(userAnswer)) {
-      document.getElementById("feedback").textContent = "⚠️ Masukkan angka!";
-      return;
-    }
-
-    if (userAnswer === correctAnswer) {
-      score++;
-      document.getElementById("feedback").textContent = "✅ Benar!";
-    } else {
-      document.getElementById("feedback").textContent = `❌ Salah! Jawaban benar: ${correctAnswer}`;
-    }
-    document.getElementById("score").textContent = score;
+  // Battery info
+  if (navigator.getBattery) {
+    navigator.getBattery().then(function(battery) {
+      function updateBattery() {
+        document.getElementById('battery').innerText = Math.round(battery.level * 100) + "%";
+        document.getElementById('batteryStatus').innerText = battery.charging ? "Charging" : "Discharging";
+      }
+      updateBattery();
+      battery.addEventListener("levelchange", updateBattery);
+      battery.addEventListener("chargingchange", updateBattery);
+    });
   }
-
-  // mulai langsung dengan soal pertama
-  newQuestion();
 </script>
 
 </body>
-</html>
+      </html>
