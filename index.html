@@ -5,264 +5,174 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wildan Renaldinata</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(270deg, #ff6ec7, #42a5f5, #ffb74d, #7873f5, #4ecdc4, #ffe66d);
-      background-size: 1000% 1000%;
-      animation: gradientShift 15s ease infinite;
+      background: linear-gradient(270deg, #ff6ec7, #42a5f5, #ffb74d);
       min-height: 100vh;
-      color: #333;
-    }
-    @keyframes gradientShift {
-      0%{background-position:0% 50%}
-      50%{background-position:100% 50%}
-      100%{background-position:0% 50%}
-    }
-    .card {
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    header {
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      border-radius: 12px;
     }
     section {
-      background-color: rgba(255, 255, 255, 0.9);
+      background: #fff;
       padding: 20px;
-      max-width: 800px;
       margin: 20px auto;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      text-align: center;
     }
     #board {
       display: grid;
-      grid-template-columns: repeat(3, 100px);
+      grid-template-columns: repeat(3, 90px);
       gap: 5px;
       justify-content: center;
-      margin: 20px auto;
     }
     .cell {
-      width: 100px;
-      height: 100px;
-      background: #fff;
-      border: 2px solid #333;
-      font-size: 40px;
-      text-align: center;
-      line-height: 100px;
+      width: 90px;
+      height: 90px;
+      font-size: 35px;
+      border: 2px solid #000;
       cursor: pointer;
-      user-select: none;
-      font-weight: bold;
-    }
-    #status {
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-    }
-    #quiz input {
-      padding: 8px;
-      font-size: 16px;
-      width: 100px;
-      margin-right: 10px;
-    }
-    #quiz p {
-      font-size: 18px;
-      font-weight: bold;
+      line-height: 90px;
     }
   </style>
 </head>
+
 <body>
 
-<!-- Navbar -->
-<nav class="navbar bg-light shadow-sm">
-  <div class="container-fluid">
-    <span class="fw-bold">Wildan Renaldinata</span>
-    <img src="https://placekitten.com/50/50" class="rounded-circle" width="40" height="40">
+<section>
+  <h2>❌⭕ Tic Tac Toe MODE DEWA 😈</h2>
+  <div id="board">
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell"></div>
   </div>
-</nav>
-
-<div class="container py-4">
-  <!-- Time -->
-  <div class="card p-3 text-center mb-3">
-    <h5 class="fw-bold">⏰ Time Information</h5>
-    <h3 id="time">--:--:--</h3>
-    <p id="greet">Hello!</p>
-  </div>
-
-  <!-- Battery -->
-  <div class="card p-3 text-center mb-3">
-    <h5 class="fw-bold">🔋 Battery Information</h5>
-    <h3 id="battery">--%</h3>
-    <p id="batteryStatus">Checking...</p>
-  </div>
-
-  <!-- Profile -->
-  <section id="profile">
-    <h2>🧑 Tentang Saya</h2>
-    <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka scroll tiktok.</p>
-  </section>
-
-  <!-- Tic Tac Toe -->
-  <section id="tictactoe">
-    <h2>❌⭕ Game Tic Tac Toe (vs Bot)</h2>
-    <div id="board">
-      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-    </div>
-    <p id="status">Giliran: X (Kamu)</p>
-    <button class="btn btn-primary" onclick="resetGame()">🔄 Mulai Ulang</button>
-  </section>
-
-  <!-- Quiz -->
-  <section id="quiz">
-    <h2>➗✖️ Game Perkalian & Pembagian</h2>
-    <p id="question">Soal akan muncul di sini...</p>
-    <input type="number" id="answer" placeholder="Jawaban">
-    <button class="btn btn-success" onclick="checkAnswer()">✔️ Jawab</button>
-    <p id="feedback"></p>
-    <p>Skor: <span id="score">0</span></p>
-    <button class="btn btn-warning" onclick="newQuestion()">🔄 Soal Baru</button>
-  </section>
-
-  <!-- Thanks -->
-  <div class="card mt-4 p-3">
-    <h6>🌟 Special Thanks To:</h6>
-    <ul>
-      <li>Orang tua</li>
-      <li>Allah SWT</li>
-      <li>Nabi Muhammad Saw.</li>
-      <li>Vercel App</li>
-    </ul>
-  </div>
-
-  <footer class="text-center text-white mt-4">
-    <p>Copyright © 2025 WildanR. All rights reserved.</p>
-  </footer>
-</div>
+  <p id="status">Giliran: Kamu (X)</p>
+  <button onclick="resetGame()">🔄 Reset</button>
+</section>
 
 <script>
-  // Time updater
-  function updateTime() {
-    let now = new Date();
-    let h = String(now.getHours()).padStart(2,'0');
-    let m = String(now.getMinutes()).padStart(2,'0');
-    let s = String(now.getSeconds()).padStart(2,'0');
-    document.getElementById('time').innerText = `${h}:${m}:${s}`;
-    document.getElementById('greet').innerText = h < 12 ? "Good Morning!" : h < 18 ? "Good Afternoon!" : "Good Evening!";
-  }
-  setInterval(updateTime,1000);
+const cells = document.querySelectorAll(".cell");
+const statusText = document.getElementById("status");
+let gameOver = false;
 
-  // Battery info
-  if (navigator.getBattery) {
-    navigator.getBattery().then(function(battery) {
-      function updateBattery() {
-        document.getElementById('battery').innerText = Math.round(battery.level * 100) + "%";
-        document.getElementById('batteryStatus').innerText = battery.charging ? "Charging" : "Discharging";
+function checkWin(mark){
+  const win = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  return win.some(([a,b,c]) =>
+    cells[a].textContent===mark &&
+    cells[b].textContent===mark &&
+    cells[c].textContent===mark
+  );
+}
+
+function checkDraw(){
+  return [...cells].every(c => c.textContent !== "");
+}
+
+/* ===== AI DEWA ===== */
+function minimax(board,isMax){
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  function winner(b){
+    for(let [a,b1,c] of wins){
+      if(b[a] && b[a]==b[b1] && b[a]==b[c]) return b[a];
+    }
+    if(!b.includes("")) return "draw";
+    return null;
+  }
+
+  let res = winner(board);
+  if(res==="O") return 1;
+  if(res==="X") return -1;
+  if(res==="draw") return 0;
+
+  if(isMax){
+    let best=-Infinity;
+    for(let i=0;i<9;i++){
+      if(board[i]==""){
+        board[i]="O";
+        best=Math.max(best,minimax(board,false));
+        board[i]="";
       }
-      updateBattery();
-      battery.addEventListener("levelchange", updateBattery);
-      battery.addEventListener("chargingchange", updateBattery);
-    });
-  }
-
-  // === Tic Tac Toe ===
-  const cells = document.querySelectorAll(".cell");
-  const status = document.getElementById("status");
-  let gameOver = false;
-
-  function checkWin(mark) {
-    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    return wins.some(combo => {
-      const [a, b, c] = combo;
-      return cells[a].textContent === mark &&
-             cells[b].textContent === mark &&
-             cells[c].textContent === mark;
-    });
-  }
-
-  function checkDraw() {
-    return [...cells].every(cell => cell.textContent);
-  }
-
-  function botMove() {
-    if (gameOver) return;
-    let emptyCells = [...cells].filter(cell => cell.textContent === "");
-    if (emptyCells.length === 0) return;
-    let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    randomCell.textContent = "O";
-    if (checkWin("O")) {
-      status.textContent = "Bot menang! 🤖🎉";
-      gameOver = true;
-    } else if (checkDraw()) {
-      status.textContent = "Seri! 😅";
-      gameOver = true;
-    } else {
-      status.textContent = "Giliran: X (Kamu)";
     }
-  }
-
-  function resetGame() {
-    cells.forEach(cell => cell.textContent = "");
-    gameOver = false;
-    status.textContent = "Giliran: X (Kamu)";
-  }
-
-  cells.forEach(cell => {
-    cell.addEventListener("click", () => {
-      if (cell.textContent || gameOver) return;
-      cell.textContent = "X";
-      if (checkWin("X")) {
-        status.textContent = "Kamu menang! 🎉";
-        gameOver = true;
-      } else if (checkDraw()) {
-        status.textContent = "Seri! 😅";
-        gameOver = true;
-      } else {
-        status.textContent = "Giliran: O (Bot...)";
-        setTimeout(botMove, 500);
+    return best;
+  } else {
+    let best=Infinity;
+    for(let i=0;i<9;i++){
+      if(board[i]==""){
+        board[i]="X";
+        best=Math.min(best,minimax(board,true));
+        board[i]="";
       }
-    });
-  });
+    }
+    return best;
+  }
+}
 
-  // === Quiz ===
-  let correctAnswer = 0;
-  let score = 0;
-  function newQuestion() {
-    let num1 = Math.floor(Math.random() * 10) + 1;
-    let num2 = Math.floor(Math.random() * 10) + 1;
-    let isMultiply = Math.random() < 0.5;
-    if (isMultiply) {
-      document.getElementById("question").textContent = `${num1} × ${num2} = ?`;
-      correctAnswer = num1 * num2;
-    } else {
-      let product = num1 * num2;
-      document.getElementById("question").textContent = `${product} ÷ ${num1} = ?`;
-      correctAnswer = num2;
+function botMove(){
+  if(gameOver) return;
+
+  let board=[...cells].map(c=>c.textContent);
+  let bestScore=-Infinity;
+  let move;
+
+  for(let i=0;i<9;i++){
+    if(board[i]==""){
+      board[i]="O";
+      let score=minimax(board,false);
+      board[i]="";
+      if(score>bestScore){
+        bestScore=score;
+        move=i;
+      }
     }
-    document.getElementById("answer").value = "";
-    document.getElementById("feedback").textContent = "";
   }
-  function checkAnswer() {
-    let userAnswer = parseInt(document.getElementById("answer").value);
-    if (isNaN(userAnswer)) {
-      document.getElementById("feedback").textContent = "⚠️ Masukkan angka!";
-      return;
-    }
-    if (userAnswer === correctAnswer) {
-      score++;
-      document.getElementById("feedback").textContent = "✅ Benar!";
-    } else {
-      document.getElementById("feedback").textContent = `❌ Salah! Jawaban benar: ${correctAnswer}`;
-    }
-    document.getElementById("score").textContent = score;
+
+  cells[move].textContent="O";
+
+  if(checkWin("O")){
+    statusText.textContent="❌ Kamu Kalah! 🤖🔥";
+    gameOver=true;
+  } else if(checkDraw()){
+    statusText.textContent="😅 Seri!";
+    gameOver=true;
+  } else {
+    statusText.textContent="Giliran: Kamu (X)";
   }
-  newQuestion();
+}
+
+/* ===== PLAYER ===== */
+cells.forEach(cell=>{
+  cell.onclick=()=>{
+    if(cell.textContent!=="" || gameOver) return;
+
+    cell.textContent="X";
+
+    if(checkWin("X")){
+      statusText.textContent="🎉 Kamu Menang!";
+      gameOver=true;
+    } else if(checkDraw()){
+      statusText.textContent="😅 Seri!";
+      gameOver=true;
+    } else {
+      statusText.textContent="Bot berpikir...";
+      setTimeout(botMove,300);
+    }
+  }
+});
+
+function resetGame(){
+  cells.forEach(c=>c.textContent="");
+  gameOver=false;
+  statusText.textContent="Giliran: Kamu (X)";
+}
 </script>
 
 </body>
