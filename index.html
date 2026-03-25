@@ -4,244 +4,213 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wildan Game Center</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body{background:#111;color:#fff;font-family:sans-serif}
-.card{border-radius:16px}
-canvas{background:#000;border-radius:10px}
+body{
+background:#111;
+color:#fff;
+font-family:sans-serif;
+}
+.card{border-radius:16px;margin-bottom:15px}
 #board{display:grid;grid-template-columns:repeat(3,100px);gap:5px;justify-content:center}
 .cell{width:100px;height:100px;background:#fff;color:#000;font-size:40px;text-align:center;line-height:100px;cursor:pointer}
-.memory-cell{width:60px;height:60px;background:#444;margin:5px;display:inline-block;border-radius:8px}
+#flappy,#dodge{background:#000;border-radius:10px}
+.memory-cell{width:60px;height:60px;background:#444;margin:5px;display:inline-block;border-radius:8px;cursor:pointer}
 .active{background:yellow!important}
 </style>
 </head>
 
 <body>
-
 <div class="container py-4">
 
-<h3 class="text-center mb-3">🎮 GAME CENTER SLIDE 😈</h3>
-
-<!-- LEADERBOARD -->
-<div class="card p-3 mb-3 text-center">
-<h5>🏆 Leaderboard</h5>
-<ul id="leaderboard"></ul>
-</div>
-
-<!-- SLIDER -->
-<div id="gameSlider" class="carousel slide" data-bs-ride="false">
-<div class="carousel-inner">
-
 <!-- TIC TAC TOE -->
-<div class="carousel-item active text-center">
-<div class="card p-3">
-<h5>🎮 TicTacToe</h5>
+<div class="card p-3 text-center">
+<h5>🎮 TicTacToe AI</h5>
 <div id="board"></div>
 <p id="status">Giliran kamu</p>
 <button onclick="resetGame()" class="btn btn-danger">Reset</button>
 </div>
-</div>
 
 <!-- FLAPPY -->
-<div class="carousel-item text-center">
-<div class="card p-3">
-<h5>🔥 Flappy</h5>
-<canvas id="flappy" width="300" height="400"></canvas>
-<p>Score: <span id="flappyScore">0</span></p>
-<button onclick="toggleFlappy()" class="btn btn-warning">⏯️ Play/Pause</button>
-</div>
+<div class="card p-3 text-center">
+<h5>🔥 Flappy Hardcore</h5>
+<canvas id="flappy" width="300" height="400"></canvas><br>
+<button onclick="toggleFlappy()" class="btn btn-warning mt-2">⏯️ Play / Pause</button>
 </div>
 
 <!-- DODGE -->
-<div class="carousel-item text-center">
-<div class="card p-3">
-<h5>🧱 Dodge</h5>
-<canvas id="dodge" width="300" height="300"></canvas>
-<p>Score: <span id="dodgeScore">0</span></p>
-<button onclick="toggleDodge()" class="btn btn-warning">⏯️ Play/Pause</button>
-</div>
+<div class="card p-3 text-center">
+<h5>🧱 Dodge Block</h5>
+<canvas id="dodge" width="300" height="300"></canvas><br>
+<button onclick="toggleDodge()" class="btn btn-warning mt-2">⏯️ Play / Pause</button>
 </div>
 
 <!-- REACTION -->
-<div class="carousel-item text-center">
-<div class="card p-3">
-<h5>⚡ Reaction</h5>
-<div id="reactionBox" style="height:120px;background:red;border-radius:10px"></div>
-<p id="reactionText"></p>
-</div>
+<div class="card p-3 text-center">
+<h5>⚡ Reaction Test</h5>
+<div id="reactionBox" style="height:120px;background:red;border-radius:10px;"></div>
+<p id="reactionText">Tunggu hijau...</p>
 </div>
 
 <!-- MEMORY -->
-<div class="carousel-item text-center">
-<div class="card p-3">
-<h5>🧠 Memory</h5>
+<div class="card p-3 text-center">
+<h5>🧠 Memory Hardcore</h5>
 <div id="memory"></div>
 <p id="memText"></p>
 </div>
-</div>
 
 </div>
-
-<!-- BUTTON -->
-<button class="carousel-control-prev" type="button" data-bs-target="#gameSlider" data-bs-slide="prev">
-<span class="carousel-control-prev-icon"></span>
-</button>
-<button class="carousel-control-next" type="button" data-bs-target="#gameSlider" data-bs-slide="next">
-<span class="carousel-control-next-icon"></span>
-</button>
-
-</div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// ===== LEADERBOARD =====
-function saveScore(game,score){
- let data=JSON.parse(localStorage.getItem("scores")||"[]");
- data.push({game,score});
- data.sort((a,b)=>b.score-a.score);
- data=data.slice(0,5);
- localStorage.setItem("scores",JSON.stringify(data));
- renderLeaderboard();
-}
-function renderLeaderboard(){
- let data=JSON.parse(localStorage.getItem("scores")||"[]");
- leaderboard.innerHTML="";
- data.forEach(d=>{
-  let li=document.createElement("li");
-  li.innerText=d.game+" - "+d.score;
-  leaderboard.appendChild(li);
- });
-}
-renderLeaderboard();
 
 // ===== TIC TAC TOE =====
 let board=["","","","","","","","",""];
 let boardEl=document.getElementById("board");
+let statusEl=document.getElementById("status");
+
 function createBoard(){
- boardEl.innerHTML="";
- for(let i=0;i<9;i++){
-  let d=document.createElement("div");
-  d.className="cell";
-  d.onclick=()=>move(i);
-  boardEl.appendChild(d);
- }}
+boardEl.innerHTML="";
+for(let i=0;i<9;i++){
+let d=document.createElement("div");
+d.className="cell";
+d.onclick=()=>move(i);
+boardEl.appendChild(d);
+}}
 createBoard();
 
-function render(){board.forEach((v,i)=>boardEl.children[i].innerText=v);}
+function render(){
+board.forEach((v,i)=>boardEl.children[i].innerText=v);
+}
+
 function move(i){
- if(board[i])return;
- board[i]="X";
- ai();
- render();
+if(board[i])return;
+board[i]="X";
+if(win("X")) return end("Kamu menang 😱");
+ai();
 }
+
 function ai(){
- let kosong=board.map((v,i)=>v==""?i:null).filter(v=>v!=null);
- board[kosong[Math.floor(Math.random()*kosong.length)]]="O";
-}
-function resetGame(){board=["","","","","","","","",""];render();}
+let kosong=board.map((v,i)=>v==""?i:null).filter(v=>v!=null);
+let rand=kosong[Math.floor(Math.random()*kosong.length)];
+board[rand]="O";
 render();
+if(win("O")) end("AI menang 😈");
+}
+
+function win(p){
+let w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+return w.some(c=>c.every(i=>board[i]==p));
+}
+
+function end(t){statusEl.innerText=t;}
+
+function resetGame(){
+board=["","","","","","","","",""];
+statusEl.innerText="Giliran kamu";
+render();
+}
+render();
+
 
 // ===== FLAPPY =====
 let ctx=flappy.getContext("2d");
-let bird={x:50,y:150,v:0},pipes=[],flappyRunning=true,flappyScore=0;
+let bird={x:50,y:150,v:0};
+let pipes=[];
+let flappyRunning=true;
 
 function toggleFlappy(){flappyRunning=!flappyRunning;}
 
 function flappyLoop(){
- if(flappyRunning){
-  ctx.clearRect(0,0,300,400);
-  bird.v+=0.6;bird.y+=bird.v;
-  ctx.fillStyle="yellow";ctx.fillRect(bird.x,bird.y,20,20);
+if(flappyRunning){
+ctx.clearRect(0,0,300,400);
+bird.v+=0.6;bird.y+=bird.v;
 
-  if(Math.random()<0.03){
-   let h=Math.random()*200;
-   pipes.push({x:300,top:h,bottom:h+120});
-  }
+ctx.fillStyle="yellow";
+ctx.fillRect(bird.x,bird.y,20,20);
 
-  pipes.forEach(p=>{
-   p.x-=4;
-   ctx.fillStyle="green";
-   ctx.fillRect(p.x,0,30,p.top);
-   ctx.fillRect(p.x,p.bottom,30,400);
-
-   if(bird.x<p.x+30 && bird.x+20>p.x && (bird.y<p.top||bird.y>p.bottom)){
-    alert("Game Over 😈");
-    saveScore("Flappy",flappyScore);
-    flappyScore=0;pipes=[];bird.y=150;
-   }
-  });
-
-  flappyScore++;
-  flappyScoreEl.innerText=flappyScore;
- }
- requestAnimationFrame(flappyLoop);
+if(Math.random()<0.03){
+let h=Math.random()*200;
+pipes.push({x:300,top:h,bottom:h+120});
 }
-let flappyScoreEl=document.getElementById("flappyScore");
+
+pipes.forEach(p=>{
+p.x-=4;
+ctx.fillStyle="green";
+ctx.fillRect(p.x,0,30,p.top);
+ctx.fillRect(p.x,p.bottom,30,400);
+
+if(bird.x<p.x+30 && bird.x+20>p.x && (bird.y<p.top||bird.y>p.bottom)){
+alert("Game Over 😈");
+bird.y=150;bird.v=0;pipes=[];
+}
+});
+}
+requestAnimationFrame(flappyLoop);
+}
 flappy.onclick=()=>{if(flappyRunning)bird.v=-8;}
 flappyLoop();
 
+
 // ===== DODGE =====
 let d=dodge.getContext("2d");
-let player={x:140},blocks=[],dodgeRunning=true,dodgeScore=0;
+let player={x:140};
+let blocks=[];
+let dodgeRunning=true;
 
 function toggleDodge(){dodgeRunning=!dodgeRunning;}
 
 document.addEventListener("keydown",e=>{
- if(e.key=="ArrowLeft")player.x-=20;
- if(e.key=="ArrowRight")player.x+=20;
- player.x=Math.max(0,Math.min(280,player.x));
+if(e.key=="ArrowLeft")player.x-=20;
+if(e.key=="ArrowRight")player.x+=20;
+player.x=Math.max(0,Math.min(280,player.x));
 });
 
 function dodgeLoop(){
- if(dodgeRunning){
-  d.clearRect(0,0,300,300);
-  d.fillStyle="white";
-  d.fillRect(player.x,260,20,20);
+if(dodgeRunning){
+d.clearRect(0,0,300,300);
 
-  if(Math.random()<0.05)blocks.push({x:Math.random()*280,y:0});
+d.fillStyle="white";
+d.fillRect(player.x,260,20,20);
 
-  blocks.forEach(b=>{
-   b.y+=3;
-   d.fillRect(b.x,b.y,20,20);
+if(Math.random()<0.05)blocks.push({x:Math.random()*280,y:0});
 
-   if(b.y>260 && b.x<player.x+20 && b.x+20>player.x){
-    alert("Kena 😈");
-    saveScore("Dodge",dodgeScore);
-    dodgeScore=0;blocks=[];
-   }
-  });
+blocks.forEach(b=>{
+b.y+=3;
+d.fillRect(b.x,b.y,20,20);
 
-  dodgeScore++;
-  dodgeScoreEl.innerText=dodgeScore;
- }
- requestAnimationFrame(dodgeLoop);
+if(b.y>260 && b.x<player.x+20 && b.x+20>player.x){
+alert("Kena 😈");
+blocks=[];
 }
-let dodgeScoreEl=document.getElementById("dodgeScore");
+});
+}
+requestAnimationFrame(dodgeLoop);
+}
 dodgeLoop();
+
 
 // ===== REACTION =====
 let start;
 function startReaction(){
- reactionBox.style.background="red";
- setTimeout(()=>{
-  reactionBox.style.background="green";
-  start=Date.now();
- },Math.random()*3000+1000);
+reactionBox.style.background="red";
+reactionText.innerText="Tunggu...";
+setTimeout(()=>{
+reactionBox.style.background="green";
+start=Date.now();
+reactionText.innerText="KLIK!";
+},Math.random()*3000+1000);
 }
 reactionBox.onclick=()=>{
- if(reactionBox.style.background=="green"){
-  reactionText.innerText=(Date.now()-start)+" ms 😱";
- }else{
-  reactionText.innerText="KECEPETAN!";
- }
- startReaction();
+if(reactionBox.style.background=="green"){
+reactionText.innerText=(Date.now()-start)+" ms 😱";
+}else{
+reactionText.innerText="KECEPETAN 😡";
 }
 startReaction();
+}
+startReaction();
+
 
 // ===== MEMORY =====
 let memory=document.getElementById("memory");
@@ -249,48 +218,48 @@ let memText=document.getElementById("memText");
 let seq=[],user=[],level=1,lock=false;
 
 function createMemory(){
- for(let i=0;i<9;i++){
-  let d=document.createElement("div");
-  d.className="memory-cell";
-  d.onclick=()=>clickMem(i);
-  memory.appendChild(d);
- }}
+memory.innerHTML="";
+for(let i=0;i<9;i++){
+let d=document.createElement("div");
+d.className="memory-cell";
+d.onclick=()=>clickMem(i);
+memory.appendChild(d);
+}}
 createMemory();
 
 function startMemory(){
- user=[];lock=true;
- seq.push(Math.floor(Math.random()*9));
- memText.innerText="Level "+level;
+user=[];lock=true;
+seq.push(Math.floor(Math.random()*9));
+memText.innerText="Level "+level;
 
- seq.forEach((n,i)=>{
-  setTimeout(()=>{
-   memory.children[n].classList.add("active");
-   setTimeout(()=>memory.children[n].classList.remove("active"),300);
-  },i*600);
- });
+seq.forEach((n,i)=>{
+setTimeout(()=>{
+memory.children[n].classList.add("active");
+setTimeout(()=>memory.children[n].classList.remove("active"),300);
+},i*600);
+});
 
- setTimeout(()=>lock=false,seq.length*600);
+setTimeout(()=>lock=false,seq.length*600);
 }
 
 function clickMem(i){
- if(lock)return;
- user.push(i);
+if(lock)return;
+user.push(i);
 
- if(user[user.length-1]!=seq[user.length-1]){
-  alert("Salah 😈");
-  seq=[];level=1;
-  startMemory();
-  return;
- }
+if(user[user.length-1]!=seq[user.length-1]){
+alert("Salah 😈");
+seq=[];level=1;
+startMemory();
+return;
+}
 
- if(user.length==seq.length){
-  level++;
-  setTimeout(startMemory,500);
- }
+if(user.length==seq.length){
+level++;
+setTimeout(startMemory,500);
+}
 }
 startMemory();
 
 </script>
-
 </body>
 </html>
