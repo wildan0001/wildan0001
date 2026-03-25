@@ -64,10 +64,21 @@
       font-weight: bold;
       font-size: 18px;
     }
+    #quiz input {
+      padding: 8px;
+      font-size: 16px;
+      width: 100px;
+      margin-right: 10px;
+    }
+    #quiz p {
+      font-size: 18px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
+<!-- Navbar -->
 <nav class="navbar bg-light shadow-sm">
   <div class="container-fluid">
     <span class="fw-bold">Wildan Renaldinata</span>
@@ -76,7 +87,6 @@
 </nav>
 
 <div class="container py-4">
-
   <!-- Time -->
   <div class="card p-3 text-center mb-3">
     <h5 class="fw-bold">⏰ Time Information</h5>
@@ -91,25 +101,45 @@
     <p id="batteryStatus">Checking...</p>
   </div>
 
-  <!-- Visitor Counter -->
-  <div class="card p-3 text-center mb-3">
-    <h5 class="fw-bold">👥 Jumlah Pengunjung</h5>
-    <h3 id="visitorCount">Loading...</h3>
-  </div>
-
-  <!-- GAME TERSULIT -->
-  <div class="card p-3 text-center mb-3">
-    <h5 class="fw-bold">🎮 Game Tersulit (Mustahil Menang 😈)</h5>
-    <div id="board"></div>
-    <p id="status">Giliran kamu (X)</p>
-    <button class="btn btn-danger mt-2" onclick="resetGame()">Reset</button>
-  </div>
-
   <!-- Profile -->
-  <section>
+  <section id="profile">
     <h2>🧑 Tentang Saya</h2>
     <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>. Saya seorang penggemar teknologi, dan suka scroll tiktok.</p>
   </section>
+
+  <!-- Tic Tac Toe -->
+  <section id="tictactoe">
+    <h2>❌⭕ Game Tic Tac Toe (vs Bot)</h2>
+    <div id="board">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+    <p id="status">Giliran: X (Kamu)</p>
+    <button class="btn btn-primary" onclick="resetGame()">🔄 Mulai Ulang</button>
+  </section>
+
+  <!-- Quiz -->
+  <section id="quiz">
+    <h2>➗✖️ Game Perkalian & Pembagian</h2>
+    <p id="question">Soal akan muncul di sini...</p>
+    <input type="number" id="answer" placeholder="Jawaban">
+    <button class="btn btn-success" onclick="checkAnswer()">✔️ Jawab</button>
+    <p id="feedback"></p>
+    <p>Skor: <span id="score">0</span></p>
+    <button class="btn btn-warning" onclick="newQuestion()">🔄 Soal Baru</button>
+  </section>
+
+  <!-- Thanks -->
+  <div class="card mt-4 p-3">
+    <h6>🌟 Special Thanks To:</h6>
+    <ul>
+      <li>Orang tua</li>
+      <li>Allah SWT</li>
+      <li>Nabi Muhammad Saw.</li>
+      <li>Vercel App</li>
+    </ul>
+  </div>
 
   <footer class="text-center text-white mt-4">
     <p>Copyright © 2025 WildanR. All rights reserved.</p>
@@ -117,7 +147,7 @@
 </div>
 
 <script>
-  // Time
+  // Time updater
   function updateTime() {
     let now = new Date();
     let h = String(now.getHours()).padStart(2,'0');
@@ -128,7 +158,7 @@
   }
   setInterval(updateTime,1000);
 
-  // Battery
+  // Battery info
   if (navigator.getBattery) {
     navigator.getBattery().then(function(battery) {
       function updateBattery() {
@@ -141,122 +171,98 @@
     });
   }
 
-  // Visitor Counter
-  fetch('https://api.countapi.xyz/hit/wildan-renaldinata/visits')
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('visitorCount').innerText = data.value;
-    })
-    .catch(() => {
-      document.getElementById('visitorCount').innerText = "Error";
-    });
-
-  // GAME LOGIC (AI SUSAH)
-  let board = Array(9).fill("");
+  // === Tic Tac Toe ===
+  const cells = document.querySelectorAll(".cell");
+  const status = document.getElementById("status");
   let gameOver = false;
 
-  function renderBoard() {
-    const boardEl = document.getElementById("board");
-    boardEl.innerHTML = "";
-    board.forEach((cell, i) => {
-      let div = document.createElement("div");
-      div.className = "cell";
-      div.innerText = cell;
-      div.onclick = () => playerMove(i);
-      boardEl.appendChild(div);
+  function checkWin(mark) {
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    return wins.some(combo => {
+      const [a, b, c] = combo;
+      return cells[a].textContent === mark &&
+             cells[b].textContent === mark &&
+             cells[c].textContent === mark;
     });
   }
 
-  function playerMove(i) {
-    if (board[i] || gameOver) return;
-    board[i] = "X";
-    if (checkWin("X")) return endGame("Kamu menang 😱");
-    aiMove();
+  function checkDraw() {
+    return [...cells].every(cell => cell.textContent);
   }
 
-  function aiMove() {
-    let bestScore = -Infinity;
-    let move;
-    for (let i = 0; i < 9; i++) {
-      if (!board[i]) {
-        board[i] = "O";
-        let score = minimax(board, 0, false);
-        board[i] = "";
-        if (score > bestScore) {
-          bestScore = score;
-          move = i;
-        }
-      }
-    }
-    board[move] = "O";
-    renderBoard();
-    if (checkWin("O")) return endGame("AI Menang 😈");
-  }
-
-  function minimax(board, depth, isMaximizing) {
-    if (checkWinner("O")) return 1;
-    if (checkWinner("X")) return -1;
-    if (!board.includes("")) return 0;
-
-    if (isMaximizing) {
-      let best = -Infinity;
-      for (let i = 0; i < 9; i++) {
-        if (!board[i]) {
-          board[i] = "O";
-          best = Math.max(best, minimax(board, depth+1, false));
-          board[i] = "";
-        }
-      }
-      return best;
+  function botMove() {
+    if (gameOver) return;
+    let emptyCells = [...cells].filter(cell => cell.textContent === "");
+    if (emptyCells.length === 0) return;
+    let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    randomCell.textContent = "O";
+    if (checkWin("O")) {
+      status.textContent = "Bot menang! 🤖🎉";
+      gameOver = true;
+    } else if (checkDraw()) {
+      status.textContent = "Seri! 😅";
+      gameOver = true;
     } else {
-      let best = Infinity;
-      for (let i = 0; i < 9; i++) {
-        if (!board[i]) {
-          board[i] = "X";
-          best = Math.min(best, minimax(board, depth+1, true));
-          board[i] = "";
-        }
-      }
-      return best;
+      status.textContent = "Giliran: X (Kamu)";
     }
-  }
-
-  function checkWinner(player) {
-    const wins = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
-    ];
-    return wins.some(c => c.every(i => board[i] === player));
-  }
-
-  function checkWin(player) {
-    if (checkWinner(player)) {
-      renderBoard();
-      endGame(player === "X" ? "Kamu menang 😱" : "AI menang 😈");
-      return true;
-    }
-    if (!board.includes("")) {
-      endGame("Seri 🤝");
-      return true;
-    }
-    renderBoard();
-    return false;
-  }
-
-  function endGame(text) {
-    document.getElementById("status").innerText = text;
-    gameOver = true;
   }
 
   function resetGame() {
-    board = Array(9).fill("");
+    cells.forEach(cell => cell.textContent = "");
     gameOver = false;
-    document.getElementById("status").innerText = "Giliran kamu (X)";
-    renderBoard();
+    status.textContent = "Giliran: X (Kamu)";
   }
 
-  renderBoard();
+  cells.forEach(cell => {
+    cell.addEventListener("click", () => {
+      if (cell.textContent || gameOver) return;
+      cell.textContent = "X";
+      if (checkWin("X")) {
+        status.textContent = "Kamu menang! 🎉";
+        gameOver = true;
+      } else if (checkDraw()) {
+        status.textContent = "Seri! 😅";
+        gameOver = true;
+      } else {
+        status.textContent = "Giliran: O (Bot...)";
+        setTimeout(botMove, 500);
+      }
+    });
+  });
+
+  // === Quiz ===
+  let correctAnswer = 0;
+  let score = 0;
+  function newQuestion() {
+    let num1 = Math.floor(Math.random() * 10) + 1;
+    let num2 = Math.floor(Math.random() * 10) + 1;
+    let isMultiply = Math.random() < 0.5;
+    if (isMultiply) {
+      document.getElementById("question").textContent = `${num1} × ${num2} = ?`;
+      correctAnswer = num1 * num2;
+    } else {
+      let product = num1 * num2;
+      document.getElementById("question").textContent = `${product} ÷ ${num1} = ?`;
+      correctAnswer = num2;
+    }
+    document.getElementById("answer").value = "";
+    document.getElementById("feedback").textContent = "";
+  }
+  function checkAnswer() {
+    let userAnswer = parseInt(document.getElementById("answer").value);
+    if (isNaN(userAnswer)) {
+      document.getElementById("feedback").textContent = "⚠️ Masukkan angka!";
+      return;
+    }
+    if (userAnswer === correctAnswer) {
+      score++;
+      document.getElementById("feedback").textContent = "✅ Benar!";
+    } else {
+      document.getElementById("feedback").textContent = `❌ Salah! Jawaban benar: ${correctAnswer}`;
+    }
+    document.getElementById("score").textContent = score;
+  }
+  newQuestion();
 </script>
 
 </body>
