@@ -1,286 +1,286 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wildan Renaldinata</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wildan Game App</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(270deg, #ff6ec7, #42a5f5, #ffb74d, #7873f5, #4ecdc4, #ffe66d);
-      background-size: 1000% 1000%;
-      animation: gradientShift 15s ease infinite;
-      min-height: 100vh;
-      color: #333;
-    }
-    @keyframes gradientShift {
-      0%{background-position:0% 50%}
-      50%{background-position:100% 50%}
-      100%{background-position:0% 50%}
-    }
-    .card {
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    section {
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      max-width: 800px;
-      margin: 20px auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-    #board {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      gap: 5px;
-      justify-content: center;
-      margin: 20px auto;
-    }
-    .cell {
-      width: 100px;
-      height: 100px;
-      background: #fff;
-      border: 2px solid #333;
-      font-size: 40px;
-      text-align: center;
-      line-height: 100px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+background:#0f172a;
+color:#fff;
+font-family:sans-serif;
+}
+.screen{display:none;}
+.active{display:block;}
+.card{border-radius:20px}
+canvas{background:#000;border-radius:10px}
+.btn{border-radius:12px}
+</style>
 </head>
+
 <body>
 
-<nav class="navbar bg-light shadow-sm">
-  <div class="container-fluid">
-    <span class="fw-bold">Wildan Renaldinata</span>
-    <img src="https://placekitten.com/50/50" class="rounded-circle" width="40">
-  </div>
-</nav>
+<div class="container py-3">
 
-<div class="container py-4">
+<!-- LOGIN -->
+<div id="loginScreen" class="screen active text-center">
+<h3>🎮 Login Game</h3>
+<input id="playerName" class="form-control my-3" placeholder="Masukkan nama">
+<button class="btn btn-success w-100" onclick="login()">Masuk</button>
+</div>
 
-  <!-- TIME -->
-  <div class="card p-3 text-center mb-3">
-    <h5>⏰ Time</h5>
-    <h3 id="time"></h3>
-    <p id="greet"></p>
-  </div>
+<!-- HOME -->
+<div id="homeScreen" class="screen text-center">
+<h3>🏠 Game Menu</h3>
 
-  <!-- BATTERY -->
-  <div class="card p-3 text-center mb-3">
-    <h5>🔋 Battery</h5>
-    <h3 id="battery"></h3>
-    <p id="batteryStatus"></p>
-  </div>
+<div class="card p-3 mb-2" onclick="openGame('flappy')">🔥 Flappy</div>
+<div class="card p-3 mb-2" onclick="openGame('dodge')">🧱 Dodge</div>
+<div class="card p-3 mb-2" onclick="openGame('reaction')">⚡ Reaction</div>
+<div class="card p-3 mb-2" onclick="openGame('memory')">🧠 Memory</div>
 
-  <!-- VISITOR -->
-  <div class="card p-3 text-center mb-3">
-    <h5>👥 Pengunjung</h5>
-    <h3 id="visitorCount">Loading...</h3>
-  </div>
+<div class="card p-3 mt-3">
+<h5>🏆 Leaderboard</h5>
+<ul id="leaderboard"></ul>
+</div>
 
-  <!-- TIC TAC TOE -->
-  <div class="card p-3 text-center mb-3">
-    <h5>🎮 TicTacToe Mustahil 😈</h5>
-    <div id="board"></div>
-    <p id="status">Giliran kamu (X)</p>
-    <button class="btn btn-danger" onclick="resetGame()">Reset</button>
-  </div>
+</div>
 
-  <!-- FLAPPY -->
-  <div class="card p-3 text-center mb-3">
-    <h5>🔥 Flappy Hardcore</h5>
-    <canvas id="flappy" width="300" height="400" style="background:#000;border-radius:10px;"></canvas>
-  </div>
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen text-center">
+<button class="btn btn-secondary mb-2" onclick="goHome()">⬅️ Kembali</button>
 
-  <!-- REACTION -->
-  <div class="card p-3 text-center mb-3">
-    <h5>⚡ Reaction Test</h5>
-    <div id="reactionBox" style="height:150px;background:red;border-radius:10px;"></div>
-    <p id="reactionText">Tunggu hijau...</p>
-  </div>
+<!-- FLAPPY -->
+<div id="flappyGame" class="game">
+<h5>🔥 Flappy</h5>
+<canvas id="flappy" width="300" height="400"></canvas>
+<p>Score: <span id="flappyScore">0</span></p>
+</div>
 
-  <!-- PROFILE -->
-  <section>
-    <h2>🧑 Tentang Saya</h2>
-    <p>Halo! Nama saya <strong>Wildan Renaldinata</strong>.</p>
-  </section>
+<!-- DODGE -->
+<div id="dodgeGame" class="game">
+<h5>🧱 Dodge</h5>
+<canvas id="dodge" width="300" height="300"></canvas>
+<p>Score: <span id="dodgeScore">0</span></p>
+</div>
+
+<!-- REACTION -->
+<div id="reactionGame" class="game">
+<h5>⚡ Reaction</h5>
+<div id="reactionBox" style="height:120px;background:red;border-radius:10px"></div>
+<p id="reactionText"></p>
+</div>
+
+<!-- MEMORY -->
+<div id="memoryGame" class="game">
+<h5>🧠 Memory</h5>
+<div id="memory"></div>
+<p id="memText"></p>
+</div>
+
+</div>
 
 </div>
 
 <script>
-// TIME
-setInterval(()=>{
-  let d=new Date();
-  let h=d.getHours().toString().padStart(2,'0');
-  let m=d.getMinutes().toString().padStart(2,'0');
-  let s=d.getSeconds().toString().padStart(2,'0');
-  time.innerText=`${h}:${m}:${s}`;
-  greet.innerText=h<12?"Morning":h<18?"Afternoon":"Evening";
-},1000);
 
-// BATTERY
-if(navigator.getBattery){
- navigator.getBattery().then(b=>{
-  function u(){
-   battery.innerText=Math.round(b.level*100)+"%";
-   batteryStatus.innerText=b.charging?"Charging":"Discharging";
-  }
-  u(); b.onlevelchange=u; b.onchargingchange=u;
- });
+// ===== GLOBAL =====
+let player="Guest";
+
+function show(id){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById(id).classList.add("active");
 }
 
-// VISITOR
-fetch('https://api.countapi.xyz/hit/wildan-renaldinata/visits')
-.then(r=>r.json()).then(d=>visitorCount.innerText=d.value);
-
-// TIC TAC TOE AI
-let board=["","","","","","","","",""];
-let gameOver=false;
-
-function render(){
- board.forEach((v,i)=>{
-  document.getElementById("board").children[i].innerText=v;
- });
+// ===== LOGIN =====
+function login(){
+player = document.getElementById("playerName").value || "Guest";
+show("homeScreen");
 }
 
-function createBoard(){
- let b=document.getElementById("board");
- b.innerHTML="";
- for(let i=0;i<9;i++){
-  let d=document.createElement("div");
-  d.className="cell";
-  d.onclick=()=>move(i);
-  b.appendChild(d);
- }
-}
-createBoard();
-
-function move(i){
- if(board[i]||gameOver)return;
- board[i]="X";
- if(win("X")) return end("Kamu Menang 😱");
- ai();
+// ===== NAVIGATION =====
+function openGame(game){
+show("gameScreen");
+document.querySelectorAll(".game").forEach(g=>g.style.display="none");
+document.getElementById(game+"Game").style.display="block";
 }
 
-function ai(){
- let best=-Infinity,move;
- for(let i=0;i<9;i++){
-  if(!board[i]){
-   board[i]="O";
-   let s=minimax(false);
-   board[i]="";
-   if(s>best){best=s;move=i;}
-  }
- }
- board[move]="O";
- render();
- if(win("O")) end("AI Menang 😈");
+function goHome(){
+show("homeScreen");
 }
 
-function minimax(max){
- if(win("O")) return 1;
- if(win("X")) return -1;
- if(!board.includes("")) return 0;
-
- if(max){
-  let best=-Infinity;
-  for(let i=0;i<9;i++){
-   if(!board[i]){
-    board[i]="O";
-    best=Math.max(best,minimax(false));
-    board[i]="";
-   }
-  }
-  return best;
- }else{
-  let best=Infinity;
-  for(let i=0;i<9;i++){
-   if(!board[i]){
-    board[i]="X";
-    best=Math.min(best,minimax(true));
-    board[i]="";
-   }
-  }
-  return best;
- }
+// ===== SOUND =====
+function playSound(){
+let audio=new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+audio.play();
 }
 
-function win(p){
- let w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
- return w.some(c=>c.every(i=>board[i]==p));
+// ===== LEADERBOARD =====
+function saveScore(game,score){
+let data=JSON.parse(localStorage.getItem("scores")||"[]");
+data.push({player,game,score});
+data.sort((a,b)=>b.score-a.score);
+data=data.slice(0,5);
+localStorage.setItem("scores",JSON.stringify(data));
+renderLeaderboard();
 }
 
-function end(t){
- status.innerText=t;
- gameOver=true;
- render();
+function renderLeaderboard(){
+let data=JSON.parse(localStorage.getItem("scores")||"[]");
+let el=document.getElementById("leaderboard");
+el.innerHTML="";
+data.forEach(d=>{
+let li=document.createElement("li");
+li.innerText=`${d.player} - ${d.game} (${d.score})`;
+el.appendChild(li);
+});
+}
+renderLeaderboard();
+
+
+// ===== FLAPPY =====
+let ctx=flappy.getContext("2d");
+let bird={x:50,y:150,v:0},pipes=[],scoreF=0;
+
+function loopF(){
+ctx.clearRect(0,0,300,400);
+bird.v+=0.6;bird.y+=bird.v;
+
+ctx.fillStyle="yellow";
+ctx.fillRect(bird.x,bird.y,20,20);
+
+if(Math.random()<0.03){
+let h=Math.random()*200;
+pipes.push({x:300,top:h,bottom:h+120});
 }
 
-function resetGame(){
- board=["","","","","","","","",""];
- gameOver=false;
- status.innerText="Giliran kamu (X)";
- render();
+pipes.forEach(p=>{
+p.x-=4;
+ctx.fillStyle="green";
+ctx.fillRect(p.x,0,30,p.top);
+ctx.fillRect(p.x,p.bottom,30,400);
+
+if(bird.x<p.x+30 && bird.x+20>p.x && (bird.y<p.top||bird.y>p.bottom)){
+playSound();
+saveScore("Flappy",scoreF);
+scoreF=0;pipes=[];bird.y=150;
 }
+});
 
-// FLAPPY
-let c=flappy,ctx=c.getContext("2d");
-let bird={x:50,y:150,v:0},pipes=[];
+scoreF++;
+flappyScore.innerText=scoreF;
 
-function loop(){
- ctx.clearRect(0,0,300,400);
- bird.v+=0.6; bird.y+=bird.v;
- ctx.fillStyle="yellow";
- ctx.fillRect(bird.x,bird.y,20,20);
-
- if(Math.random()<0.03){
-  let h=Math.random()*200;
-  pipes.push({x:300,top:h,bottom:h+120});
- }
-
- ctx.fillStyle="green";
- pipes.forEach(p=>{
-  p.x-=4;
-  ctx.fillRect(p.x,0,30,p.top);
-  ctx.fillRect(p.x,p.bottom,30,400);
-
-  if(bird.x<p.x+30 && bird.x+20>p.x && (bird.y<p.top||bird.y>p.bottom)){
-   alert("Game Over 😈");
-   bird.y=150; pipes=[];
-  }
- });
-
- requestAnimationFrame(loop);
+requestAnimationFrame(loopF);
 }
 flappy.onclick=()=>bird.v=-8;
-loop();
+loopF();
 
-// REACTION
+
+// ===== DODGE =====
+let d=dodge.getContext("2d");
+let playerX=140,blocks=[],scoreD=0;
+
+document.addEventListener("keydown",e=>{
+if(e.key=="ArrowLeft")playerX-=20;
+if(e.key=="ArrowRight")playerX+=20;
+playerX=Math.max(0,Math.min(280,playerX));
+});
+
+function loopD(){
+d.clearRect(0,0,300,300);
+d.fillStyle="white";
+d.fillRect(playerX,260,20,20);
+
+if(Math.random()<0.05)blocks.push({x:Math.random()*280,y:0});
+
+blocks.forEach(b=>{
+b.y+=3;
+d.fillRect(b.x,b.y,20,20);
+
+if(b.y>260 && b.x<playerX+20 && b.x+20>playerX){
+playSound();
+saveScore("Dodge",scoreD);
+scoreD=0;blocks=[];
+}
+});
+
+scoreD++;
+dodgeScore.innerText=scoreD;
+
+requestAnimationFrame(loopD);
+}
+loopD();
+
+
+// ===== REACTION =====
 let start;
-function startGame(){
- reactionBox.style.background="red";
- reactionText.innerText="Tunggu...";
- setTimeout(()=>{
-  reactionBox.style.background="green";
-  start=Date.now();
-  reactionText.innerText="KLIK!";
- },Math.random()*3000+1000);
+function startR(){
+reactionBox.style.background="red";
+setTimeout(()=>{
+reactionBox.style.background="green";
+start=Date.now();
+},Math.random()*3000+1000);
 }
 reactionBox.onclick=()=>{
- if(reactionBox.style.background=="green"){
-  reactionText.innerText=(Date.now()-start)+" ms 😱";
- }else{
-  reactionText.innerText="KECEPETAN! 😡";
- }
- startGame();
+if(reactionBox.style.background=="green"){
+let t=Date.now()-start;
+reactionText.innerText=t+" ms";
+saveScore("Reaction",1000-t);
+}else{
+reactionText.innerText="KECEPETAN!";
 }
-startGame();
+startR();
+}
+startR();
+
+
+// ===== MEMORY =====
+let memory=document.getElementById("memory");
+let seq=[],user=[],level=1;
+
+for(let i=0;i<9;i++){
+let d=document.createElement("div");
+d.style.width="60px";
+d.style.height="60px";
+d.style.background="#444";
+d.style.display="inline-block";
+d.style.margin="5px";
+d.onclick=()=>clickM(i);
+memory.appendChild(d);
+}
+
+function startM(){
+user=[];
+seq.push(Math.floor(Math.random()*9));
+memText.innerText="Level "+level;
+
+seq.forEach((n,i)=>{
+setTimeout(()=>{
+memory.children[n].style.background="yellow";
+setTimeout(()=>memory.children[n].style.background="#444",300);
+},i*600);
+});
+}
+
+function clickM(i){
+user.push(i);
+
+if(user[user.length-1]!=seq[user.length-1]){
+playSound();
+saveScore("Memory",level);
+seq=[];level=1;
+startM();
+return;
+}
+
+if(user.length==seq.length){
+level++;
+setTimeout(startM,500);
+}
+}
+startM();
 
 </script>
 
